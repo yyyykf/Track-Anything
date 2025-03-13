@@ -16,6 +16,7 @@ import torch
 from tools.painter import mask_painter
 import psutil
 import time
+import cv2
 try: 
     from mmcv.cnn import ConvModule
 except:
@@ -278,12 +279,17 @@ def vos_tracking_video(video_state, interactive_state, mask_dropdown):
 
     #### shanggao code for mask save
     if interactive_state["mask_save"]:
-        if not os.path.exists('./result/mask/{}'.format(video_state["video_name"].split('.')[0])):
-            os.makedirs('./result/mask/{}'.format(video_state["video_name"].split('.')[0]))
+        mask_result_path = args.mask_result_path
+        # if not os.path.exists('./result/mask/{}'.format(video_state["video_name"].split('.')[0])):
+        #     os.makedirs('./result/mask/{}'.format(video_state["video_name"].split('.')[0]))
+        if not os.path.exists(mask_result_path):
+            os.makedirs(mask_result_path)
         i = 0
         print("save mask")
         for mask in video_state["masks"]:
-            np.save(os.path.join('./result/mask/{}'.format(video_state["video_name"].split('.')[0]), '{:05d}.npy'.format(i)), mask)
+            # np.save(os.path.join('./result/mask/{}'.format(video_state["video_name"].split('.')[0]), '{:05d}.npy'.format(i)), mask)
+            mask = ((1 - mask) * 255).astype(np.uint8)
+            cv2.imwrite(os.path.join(mask_result_path, '{:05d}.png'.format(i)), mask)
             i+=1
         # save_mask(video_state["masks"], video_state["video_name"])
     #### shanggao code for mask save
@@ -377,8 +383,8 @@ folder ="./checkpoints"
 SAM_checkpoint = download_checkpoint(sam_checkpoint_url, folder, sam_checkpoint)
 xmem_checkpoint = download_checkpoint(xmem_checkpoint_url, folder, xmem_checkpoint)
 e2fgvi_checkpoint = download_checkpoint_from_google_drive(e2fgvi_checkpoint_id, folder, e2fgvi_checkpoint)
-args.port = 12212
-args.device = "cuda:3"
+# args.port = 12212
+# args.device = "cuda:3"
 # args.mask_save = True
 
 # initialize sam, xmem, e2fgvi models
