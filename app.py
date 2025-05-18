@@ -286,11 +286,13 @@ def vos_tracking_video(video_state, interactive_state, mask_dropdown):
             os.makedirs(mask_result_path)
         i = 0
         print("save mask")
-        for mask in video_state["masks"]:
+        for mask, idx in zip(video_state["masks"][video_state["select_frame_number"]:interactive_state["track_end_number"]], range(video_state["select_frame_number"], interactive_state["track_end_number"])):
             # np.save(os.path.join('./result/mask/{}'.format(video_state["video_name"].split('.')[0]), '{:05d}.npy'.format(i)), mask)
-            mask = ((1 - mask) * 255).astype(np.uint8)
-            cv2.imwrite(os.path.join(mask_result_path, '{:05d}.png'.format(i)), mask)
-            i+=1
+            up_scale = args.scale
+            mask_resized = cv2.resize(mask, (mask.shape[1] * up_scale, mask.shape[0] * up_scale), interpolation=cv2.INTER_NEAREST)
+            mask_resized = (mask_resized > 0.5).astype(np.uint8)
+            mask = ((1 - mask_resized) * 255).astype(np.uint8)
+            cv2.imwrite(os.path.join(mask_result_path, '{:05d}.png'.format(idx)), mask)
         # save_mask(video_state["masks"], video_state["video_name"])
     #### shanggao code for mask save
     return video_output, video_state, interactive_state, operation_log

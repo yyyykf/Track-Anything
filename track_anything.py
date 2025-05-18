@@ -66,6 +66,7 @@ def parse_augment():
     parser.add_argument('--port', type=int, default=6080, help="only useful when running gradio applications")  
     parser.add_argument('--debug', action="store_true")
     parser.add_argument('--mask_save', action="store_true")
+    parser.add_argument('--scale', type=int, default=1)
     parser.add_argument('--mask_result_path', type=str, default="./result/mask")
     args = parser.parse_args()
 
